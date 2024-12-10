@@ -5,7 +5,7 @@ from ultralytics import YOLO
 from utils.utils import add_angle_result, calculate_md5, get_res_infos, save_res_infos
 
 model_path = "./best-cpu.onnx"
-img_path = "./imgs/test.jpg"
+img_path = "./imgs/test.bmp"
 save_path = "./res/data.txt"
 model = YOLO(model_path, task='obb')
 
