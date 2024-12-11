@@ -1,5 +1,0 @@
-CenterPoint 557.6791975,1081.4055174999999
-Angle -0.46342070943746216
-Position above
-Diameter 1083.6478009611412
-SliderAngle res_infos['SliderAngle']

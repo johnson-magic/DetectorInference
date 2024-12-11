@@ -1,3 +1,7 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw, ImageFont
+
 def add_angle_result(result: list) -> list:
     result = [x for x in result if x["confidence"] > 0.6]
 
@@ -21,11 +25,12 @@ def add_angle_result(result: list) -> list:
     
     slide_coors = [(slide_res["box"][f"x{i}"], slide_res["box"][f"y{i}"])
                        for i in range(1, 5)]
-    slide_res["angle"] = calculate_rotation_angle_box(slide_coors) % 60
-    if slide_res["angle"] > 10:
-        slide_res["angle"] = slide_res["angle"] - 60
-    elif slide_res["angle"] < -10:
-        slide_res["angle"] = slide_res["angle"] + 60
+    # slide_res["angle"] = calculate_rotation_angle_box(slide_coors) % 60
+    # if slide_res["angle"] > 10:
+    #     slide_res["angle"] = slide_res["angle"] - 60
+    # elif slide_res["angle"] < -10:
+    #     slide_res["angle"] = slide_res["angle"] + 60
+    slide_res["angle"] = calculate_rotation_angle_box(slide_coors)
     
         
     result = []
@@ -260,38 +265,123 @@ def calculate_center(vertices: list)-> tuple:
 
     return (cx, cy)
 
+def draw_rotated_rectangle(image_path, vertices, color, save_path):
+    """
+    在图像上绘制旋转矩形框
+
+    :param image_path: 图片的路径
+    :param vertices: 四个顶点坐标的列表，格式为 [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+    :param color: 绘制矩形框的颜色，格式为 (r, g, b)
+    """
+    # 打开图像
+    with Image.open(image_path) as img:
+        draw = ImageDraw.Draw(img)
+        
+        # 绘制矩形框
+        draw.line(vertices + [vertices[0]], fill=color, width=2)  # 连接最后一个点到第一个点
+
+        # 显示或保存结果图像
+        # img.show()  # 显示图片
+        img.save(save_path)  # 可以选择保存图片
+        #return img
+
+def draw_label(image_path: str, vertices: list, label: str, color: tuple, save_path: str)-> None:
+    """在第一个点上渲染label信息
+    
+    image_path: str, （待绘制）图片路径
+    vertices: list,  [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+    label: 待渲染label信息
+    color: 渲染文字颜色
+    save_path: str, （渲染）图片保存路径
+    """
+    first_point = vertices[0]
+    with Image.open(image_path) as img:
+        draw = ImageDraw.Draw(img)
+        
+        font_path = "Arial.Unicode.ttf"
+        size = max(round(sum(img.size) / 2 * 0.035), 12)
+        font = ImageFont.truetype(str(font_path), size)
+    
+        w, h = font.getsize(label)  # text width, height
+        outside = first_point[1] >= h  # label fits outside box
+        if first_point[0] > img.size[0] - w:  # size is (w, h), check if label extend beyond right side of image
+            first_point = (img.size[0] - w, first_point[1])
+        draw.rectangle((first_point[0], first_point[1] - h if outside else first_point[1],
+                        first_point[0] + w + 1, first_point[1] + 1 if outside else first_point[1] + h + 1),
+                fill=color,
+            )
+            
+        draw.text((first_point[0], first_point[1] - h if outside else first_point[1]), label, fill=(0, 0, 0), font=font)
+    img.save(save_path)
+
+    
+def draw_axes(image_path, center, save_path):
+    """
+    在图像上以给定点为中心绘制坐标轴
+
+    :param image_path: 图片的路径
+    :param center: 中心点坐标 (x, y)
+    """
+    # 打开图像
+    with Image.open(image_path) as img:
+        draw = ImageDraw.Draw(img)
+        
+        # 中心点坐标
+        x, y = center
+        
+        # 坐标轴长度（15个像素，纵横各一半，总共30个像素）
+        length = 15  
+
+        # 绘制X轴（横轴）
+        draw.line([(x - length, y), (x + length, y)], fill="black", width=1)
+
+        # 绘制Y轴（纵轴）
+        draw.line([(x, y - length), (x, y + length)], fill="black", width=1)
+
+        # 显示结果图像
+        # img.show()  # 显示图片
+        # img.save('output_image.jpg')  # 可以选择保存图片
+        img.save(save_path)
+    
+    
+
 def vis_res_infos(json_result, src_path, vis_path):
-    shutil.copyfile(src_path, vis_path)
+    # Open the BMP image
+    with Image.open(src_path) as img:
+        # Convert to RGB (JPEG does not support transparency)
+        rgb_image = img.convert('RGB')
+        # Save as JPG
+        rgb_image.save(vis_path, 'JPEG')
     for res in json_result:
         if res["name"] == "plates":
             # 绘制预测框，和角度
             angle = res["angle"]
             coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
                     for i in range(1, 5)]
-            draw_rotated_rectangle(dst_path, coor, (11, 219, 235), dst_path)
+            draw_rotated_rectangle(vis_path, coor, (11, 219, 235), vis_path)
             label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
-            draw_label(dst_path, coor, label, (11, 219, 235), dst_path)
-            draw_axes(dst_path, coor[2], dst_path)
+            draw_label(vis_path, coor, label, (11, 219, 235), vis_path)
+            draw_axes(vis_path, coor[2], vis_path)
                     
         elif res["name"] == "slide":
                 # 绘制预测框，和角度
             angle = res["angle"]
             coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
                     for i in range(1, 5)]
-            draw_rotated_rectangle(dst_path, coor, (243, 243, 243), dst_path)
+            draw_rotated_rectangle(vis_path, coor, (243, 243, 243), vis_path)
             label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
-            draw_label(dst_path, coor, label, (243, 243, 243), dst_path)
-            draw_axes(dst_path, coor[2], dst_path)
+            draw_label(vis_path, coor, label, (243, 243, 243), vis_path)
+            draw_axes(vis_path, coor[2], vis_path)
             
         elif res["name"] == "big_circle":
             # 绘制预测框，和角度
-            angle = res["angle"]
+            # angle = res["angle"]
             coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
                     for i in range(1, 5)]
-            draw_rotated_rectangle(dst_path, coor, (4, 42, 255), dst_path)
-            label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
-            draw_label(dst_path, coor, label, (4, 42, 255), dst_path)
-            draw_axes(dst_path, coor[2], dst_path)
+            draw_rotated_rectangle(vis_path, coor, (4, 42, 255), vis_path)
+            label = res["name"] + " " + str(round(res["confidence"], 2)) # + " " + str(round(angle, 2)) 
+            draw_label(vis_path, coor, label, (4, 42, 255), vis_path)
+            draw_axes(vis_path, coor[2], vis_path)
     
     
     
