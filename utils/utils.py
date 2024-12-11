@@ -259,6 +259,39 @@ def calculate_center(vertices: list)-> tuple:
     cy = (y1 + y2 + y3 + y4) / 4
 
     return (cx, cy)
+
+def vis_res_infos(json_result, src_path, vis_path):
+    shutil.copyfile(src_path, vis_path)
+    for res in json_result:
+        if res["name"] == "plates":
+            # 绘制预测框，和角度
+            angle = res["angle"]
+            coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
+                    for i in range(1, 5)]
+            draw_rotated_rectangle(dst_path, coor, (11, 219, 235), dst_path)
+            label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
+            draw_label(dst_path, coor, label, (11, 219, 235), dst_path)
+            draw_axes(dst_path, coor[2], dst_path)
+                    
+        elif res["name"] == "slide":
+                # 绘制预测框，和角度
+            angle = res["angle"]
+            coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
+                    for i in range(1, 5)]
+            draw_rotated_rectangle(dst_path, coor, (243, 243, 243), dst_path)
+            label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
+            draw_label(dst_path, coor, label, (243, 243, 243), dst_path)
+            draw_axes(dst_path, coor[2], dst_path)
+            
+        elif res["name"] == "big_circle":
+            # 绘制预测框，和角度
+            angle = res["angle"]
+            coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
+                    for i in range(1, 5)]
+            draw_rotated_rectangle(dst_path, coor, (4, 42, 255), dst_path)
+            label = res["name"] + " " + str(round(res["confidence"], 2)) + " " + str(round(angle, 2)) 
+            draw_label(dst_path, coor, label, (4, 42, 255), dst_path)
+            draw_axes(dst_path, coor[2], dst_path)
     
     
     
