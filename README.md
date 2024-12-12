@@ -1,4 +1,8 @@
 # PrecisionAngleDetectionInference
+## 方法1: 傻瓜式安装方式 
+* 双击*click_me_to_install.bat*安装程序
+* 双击*click_me_to_run.bat*运行程序
+## 方法2: 通过指令安装
 1. 安装python
 
 * 在Windows Command下安装miniconda
