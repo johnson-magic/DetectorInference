@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <thread>
+#include <chrono> // 包含时间相关的库
 
 using namespace cv;
 using namespace std;
@@ -24,14 +26,20 @@ cv::Mat formatToSquare(const cv::Mat &source)
 
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect) {
     // 获取 RotatedRect 的角点
-    cv::Point2f vertices[4];
-    rotatedRect.points(vertices);
+    Point2f vertices[4];
+	RotatedRect rRect = RotatedRect(Point2f(100,100), Size2f(100,50), 30);
+	rRect.points(vertices);
 
-    // 在图像上绘制旋转矩形的四个角点
-    for (int i = 0; i < 4; ++i) {
+
+    //rotatedRect.points(vertices);
+
+    //在图像上绘制旋转矩形的四个角点
+    // for(int j = 0; j < 4; ++j) {
+	// 	std::cout<<"123"<<std::endl;
+	// }
         // 将角点连接成一个多边形
-        cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
-    }
+        //cv::line(image, rotatedRect.points[0], rotatedRect.points[(0 + 1) % 4], cv::Scalar(0, 255, 0), 2);
+    //}
 }
 
 // define a struct to save some information
@@ -68,14 +76,20 @@ int main(){
 	std::vector<std::string> output_node_names;
 
     Ort::SessionOptions session_options;
+	// std::string model_name = "yolov11-onnx";
+	// see https://github.com/ami-iit/bipedal-locomotion-framework/commit/77a3313d2e5ab385fbc1c7dc1ff89681dd723def#diff-ebc4740cd40eee3ebb9bfc92a49ed08565c040e255df15d0e8e5ec5fe138c4daR173
+	// std::basic_string<ORTCHAR_T> model_name_w(model_name.begin(), model_name.end());
 	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "yolov11-onnx");
 	session_options.SetGraphOptimizationLevel(ORT_ENABLE_BASIC);
-	Ort::Session session_(env, onnx_path_name.c_str(), session_options);
+	
+	std::basic_string<ORTCHAR_T> model_path_w(onnx_path_name.begin(), onnx_path_name.end());
+	Ort::Session session_(env, model_path_w.c_str(), session_options);
 
     size_t numInputNodes = session_.GetInputCount();
 	size_t numOutputNodes = session_.GetOutputCount();
 	Ort::AllocatorWithDefaultOptions allocator;
 	input_node_names.reserve(numInputNodes);
+	std::cout<<"111111111111111111111111111111"<<std::endl;
 
     // get the input information
 	int input_w = 0;
@@ -107,7 +121,7 @@ int main(){
 	}
 	//std::cout << "input: " << input_node_names[0] << " output: " << output_node_names[0] << std::endl;
 
-
+	std::cout<<"2222222222222222222222222222222"<<std::endl;
     float x_factor = image.cols / static_cast<float>(input_w);
 	float y_factor = image.rows / static_cast<float>(input_h);
 
@@ -128,7 +142,7 @@ int main(){
 	catch (std::exception e) {
 		std::cout << e.what() << std::endl;
 	}
-
+	std::cout<<"333333333333333333333333333333"<<std::endl;
 	// output data
 	const float* pdata = ort_outputs[0].GetTensorMutableData<float>();
 	cv::Mat dout(output_h, output_w, CV_32F, (float*)pdata);
@@ -164,7 +178,8 @@ int main(){
             }
            
             BOX.Classindex=classIdPoint.x;
-            class_list.push_back(classIdPoint.x);
+           
+		    class_list.push_back(classIdPoint.x);
             BOX.score=score; 
             cv::RotatedRect box=cv::RotatedRect(cv::Point2f(cx,cy),cv::Size2f(ow,oh),angle*180/pi);
             cv::RotatedRect boxes_fenlei=cv::RotatedRect(cv::Point2f(cx+10000*BOX.Classindex,cy),cv::Size2f(ow,oh),angle*180/pi);
@@ -187,19 +202,20 @@ int main(){
 	cv::dnn::NMSBoxes(boxes_fenleis,confidences,modelScoreThreshold,modelNMSThreshold, nms_result);
     std::cout<<modelScoreThreshold<<";"<<modelNMSThreshold<<std::endl;
 
-    // for (int i=0;i< boxes.size();i++)
-	// {
-    //     if(i>1)
-    //       break;
-    //     drawRotatedRect(image_src, boxes[i]);
-    //     std:cout<<i<<":"<<confidences[i]<<std::endl;
+    // // for (int i=0;i< boxes.size();i++)
+	// // {
+    // //     if(i>1)
+    // //       break;
+    // //     drawRotatedRect(image_src, boxes[i]);
+    // //     std:cout<<i<<":"<<confidences[i]<<std::endl;
 
-	// }
+	// // }
 
 	for (int i=0;i< nms_result.size();i++)
 	{
 		int index=nms_result[i];
 		RotatedBOX Box_=BOXES[index];
+
         printRotatedRect(Box_.box);
         drawRotatedRect(image_src, Box_.box);
 
@@ -212,7 +228,19 @@ int main(){
 	session_.release();
     
     std::cout<<Remain_boxes.size()<<";"<<nms_result.size()<<std::endl;
+	std::cout << "程序将在1分钟后退出..." << std::endl;
+	std::this_thread::sleep_for(std::chrono::minutes(1));
     return 0;
     //return Remain_boxes;
 
+	
+
 }
+
+// #include <iostream>
+// #include "opencv2/opencv.hpp"
+
+// int main(){
+// 	std::cout<<CV_VERSION<<std::endl;
+// 	return 0;
+// }
