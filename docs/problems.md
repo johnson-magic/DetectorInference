@@ -11,3 +11,7 @@
      * [Opencv依赖](https://www.youtube.com/watch?v=CnXUTG9XYGI)
      * [Onnx依赖](https://blog.csdn.net/weixin_43953700/article/details/124304712)
      * [other](https://www.youtube.com/watch?v=oC69vlWofJQ)、[other](https://www.youtube.com/watch?v=aMXQshF7zdo)、[other](https://code.visualstudio.com/docs/cpp/config-mingw)、[other](https://code.visualstudio.com/docs/languages/cpp)
+3. 问题现象：The given version [11] is not supported, only version 1 to 7 is supported in this build.
+   * 解决：见参考资料
+   * 参考资料：
+     * [windows下Onnx库的使用](https://blog.csdn.net/weixin_43953700/article/details/124304712)
