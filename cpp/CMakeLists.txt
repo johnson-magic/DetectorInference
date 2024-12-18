@@ -36,6 +36,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories("C:/Users/24601/Desktop/fabu/software/onnxruntime-win-x64-1.15.1/onnxruntime-win-x64-1.15.1/include")
 
 # 设置 C++ 标准
-# set_target_properties(onnx_inference PROPERTIES
-#     CXX_STANDARD 14
-#     CXX_STANDARD_REQUIRED YES)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES)
