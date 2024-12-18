@@ -249,6 +249,13 @@ int main(){
 				Remain_boxes.push_back(Box_);
 
 			}
+			
+			cv::Point2f Centerpoint;
+			float Diameter;
+			float angle;
+			float SliderAngle;
+			cv::Point2f SliderCenterPoint;
+			std::string Position;
 
 			for (auto remain_box : Remain_boxes){
 				int cls_id = remain_box.Classindex;
@@ -260,14 +267,63 @@ int main(){
 
 				std::cout<<labels[cls_id]<<"; score is:"<<obj_score<<"; coor is:";
 				cv::Point2f vertices[4];
-    			remain_box.box.points(vertices);
+    			remain_box.box.points(vertices);  // clockwise
+
+				if(0 == cls_id){  // big_circle
+					Centerpoint = remain_box.box.center;
+					Diameter = (remain_box.box.size.width + remain_box.box.size.height)/2.0;
+				}
+				else if(1 == cls_id){  // plates
+					if(remain_box.box.size.width >= remain_box.box.size.height){    // w >= h
+						angle = - remain_box.box.angle;
+					}
+					else{
+						angle = -(90 + remain_box.box.angle);
+					}
+
+				}
+				else if(2 == cls_id){  // slide
+					if(remain_box.box.size.width >= remain_box.box.size.height){    // w >= h
+						SliderAngle = - remain_box.box.angle;
+					}
+					else{
+						SliderAngle = -(90 + remain_box.box.angle);
+					}
+					SliderCenterPoint = remain_box.box.center;
+
+				}
 				for(auto vertice : vertices){
 					std::cout<<vertice.x<<";"<<vertice.y<<std::endl;
 				}
 				std::cout<<std::endl;
 			}
 
+			if(SliderCenterPoint.y < Centerpoint.y){
+				Position = "above";
+			}
+			else{
+				Position = "below";
+			}
     		cv::imwrite("output_image.jpg", image_src);
+
+			std::ofstream outFile("res.txt");
+
+			// 检查文件是否成功打开
+			if (!outFile) {
+				std::cerr << "can not open: " << "res.txt" << std::endl;
+				return -1;
+			}
+
+			// 将变量写入文件
+			outFile << "Centerpoint: " << Centerpoint.x <<"," << Centerpoint.y << std::endl;
+			outFile << "angle: " << angle << std::endl;
+			outFile << "SliderAngle: " << SliderAngle << std::endl;
+			outFile << "angle: " << angle << std::endl;
+			outFile << "SliderCenterPoint: " << SliderCenterPoint.x <<","<<SliderCenterPoint.y<< std::endl;
+			outFile << "Position: " << Position << std::endl;
+
+			// 关闭文件
+			outFile.close();
 			std::cout<<Remain_boxes.size()<<";"<<nms_result.size()<<std::endl;
         }
     }
