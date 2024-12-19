@@ -68,15 +68,15 @@ void printRotatedRect(const cv::RotatedRect& rotatedRect) {
 }
 
 
-bool hasImageUpdated(const std::string& imagePath, std::filesystem::file_time_type& lastCheckedTime) {
+bool hasImageUpdated(const std::string& image_path, std::filesystem::file_time_type& lastCheckedTime) {
     
-    if (!std::filesystem::exists(imagePath)) {
-        std::cout << "file does not exists: " << imagePath << std::endl;
+    if (!std::filesystem::exists(image_path)) {
+        std::cout << "file does not exists: " << image_path << std::endl;
         return false;
     }
 
 
-    std::filesystem::file_time_type curWriteTime = std::filesystem::last_write_time(imagePath);
+    std::filesystem::file_time_type curWriteTime = std::filesystem::last_write_time(image_path);
     
     if (curWriteTime != lastCheckedTime) {
         lastCheckedTime = curWriteTime;
@@ -94,17 +94,23 @@ BOOL WINAPI HandleCtrlC(DWORD signal) {
     return TRUE;
 }
 
-int main(){
-	std::cout<<"00000000000000000"<<std::endl;
+int main(int argc, char** argv){
+	if(argc != 5){
+		std::cout<<"[ERROR] onnx_inference model_path img_path result_path vis_path"<<std::endl;
+		std::cout<<"e.g., ./onnx_inference.exe test.onnx test.jpg test.txt vis.jpg"<<std::endl;
+		return 0;
+	}
 
-	std::string imagePath = "A-2024-01-03-14-13-09_000032.jpg";
-    std::string onnx_path_name = "best.onnx";
+	std::string model_path = argv[1];
+	std::string image_path = argv[2];
+	std::string result_path = argv[3];
+	std::string vis_path = argv[4];
 
 	Ort::SessionOptions session_options;
 	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "yolov11-onnx");
 	session_options.SetGraphOptimizationLevel(ORT_ENABLE_BASIC);
 	std::cout<<"010000000000000000"<<std::endl;
-	std::basic_string<ORTCHAR_T> model_path_w(onnx_path_name.begin(), onnx_path_name.end());
+	std::basic_string<ORTCHAR_T> model_path_w(model_path.begin(), model_path.end());
 	std::cout<<"020000000000000000"<<std::endl;
 	Ort::Session session_(env, model_path_w.c_str(), session_options);
 	std::vector<std::string> input_node_names;
@@ -149,9 +155,9 @@ int main(){
 	std::filesystem::file_time_type lastCheckedTime = std::filesystem::file_time_type();
 	
 	while (keepRunning) {
-        if (hasImageUpdated(imagePath, lastCheckedTime)) {
+        if (hasImageUpdated(image_path, lastCheckedTime)) {
 
-			cv::Mat image_src = cv::imread(imagePath);
+			cv::Mat image_src = cv::imread(image_path);
     		if (image_src.empty()) {
         		std::cerr << "Failed to read the image!" << std::endl;
         		break;
@@ -304,13 +310,13 @@ int main(){
 			else{
 				Position = "below";
 			}
-    		cv::imwrite("output_image.jpg", image_src);
+    		cv::imwrite(vis_path, image_src);
 
-			std::ofstream outFile("res.txt");
+			std::ofstream outFile(result_path);
 
 			// 检查文件是否成功打开
 			if (!outFile) {
-				std::cerr << "can not open: " << "res.txt" << std::endl;
+				std::cerr << "can not open: " << result_path << std::endl;
 				return -1;
 			}
 
