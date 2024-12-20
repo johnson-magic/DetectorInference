@@ -45,16 +45,23 @@ void PrecisionAngleDetection::Process(const std::vector<RotatedObj> & rotated_ob
 	
 }
 
-void PrecisionAngleDetection::SaveRes(){
+void PrecisionAngleDetection::VisRes(const std::vector<RotatedObj> & rotated_objs){
 	image = cv::imread(image_path_);
 	if (image.empty()) {
 		std::cerr << "Failed to read the image!" << std::endl;
 		break;
 	}
+
+	cv::Mat& image, const cv::RotatedRect& rotatedRect
+
+	for(auto rotated_obj : rotated_objs){
+		cv::RotatedRect rotated_rect = rotated_obj.rotated_rect;
+		drawRotatedRect(image, rotated_rect);
+	}
 	cv::imwrite(vis_path_, image);
 }
 
-void PrecisionAngleDetection::VisRes(){
+void PrecisionAngleDetection::SaveRes(){
 	
 	std::ofstream outFile(result_path_);
 	// 检查文件是否成功打开
@@ -64,12 +71,12 @@ void PrecisionAngleDetection::VisRes(){
 	}
 
 	// 将变量写入文件
-	outFile << "Centerpoint: " << Centerpoint.x <<"," << Centerpoint.y << std::endl;
-	outFile << "angle: " << angle << std::endl;
-	outFile << "SliderAngle: " << SliderAngle << std::endl;
-	outFile << "angle: " << angle << std::endl;
-	outFile << "SliderCenterPoint: " << SliderCenterPoint.x <<","<<SliderCenterPoint.y<< std::endl;
-	outFile << "Position: " << Position << std::endl;
+	outFile << "Centerpoint: " << center_point_.x <<"," << center_point_.y << std::endl;
+	outFile << "angle: " << angle_ << std::endl;
+	outFile << "SliderAngle: " << slider_angle_ << std::endl;
+	outFile << "Diameter: " << diameter_ << std::endl;
+	outFile << "SliderCenterPoint: " << slider_center_point_.x << "," << slider_center_point_.y << std::endl;
+	outFile << "Position: " << position_ << std::endl;
 
 	// 关闭文件
 	outFile.close();
