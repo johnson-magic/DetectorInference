@@ -27,7 +27,14 @@ find_package(OpenCV REQUIRED)
 # include_directories(${OPENCV_INCLUDE_DIR})
 
 # 设置可执行文件名
-add_executable(${PROJECT_NAME} main.cpp) # main.cpp 为你的源文件名称
+set(SOURCES
+    main.cpp
+    interface.cpp
+    plugin.cpp
+    utils.cpp
+)
+add_executable(${PROJECT_NAME} ${SOURCES}) # main.cpp 为你的源文件名称
+include_directories("C:/Users/24601/Desktop/fabu/code/PrecisionAngleDetectionInference/cpp")
 
 # 链接 OpenCV 库和 ONNX Runtime 库
 # target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${ONNXRUNTIME_LIB_DIR}/${ONNXRUNTIME_LIB})
