@@ -75,8 +75,8 @@ def calculate_line_center(vertices: list)-> tuple:
     x2, y2 = vertices[1]
 
     # 计算中心点坐标
-    cx = (x1 + x2) / 4
-    cy = (y1 + y2) / 4
+    cx = (x1 + x2) / 2
+    cy = (y1 + y2) / 2
 
     return (cx, cy)
 
@@ -105,6 +105,9 @@ def get_res_infos(results: list) -> dict:
              
             center_point = calculate_box_center(coors)
             line_half_point = calculate_line_center(coors[:2])
+            print("cal:", coors)
+            print("cal: center_point", center_point)
+            print("cal: line_half_point", line_half_point)
             radius = calculate_distance(center_point, line_half_point)
             
             infos["CenterPoint"] = center_point
@@ -378,6 +381,7 @@ def vis_res_infos(json_result, src_path, vis_path):
             # angle = res["angle"]
             coor = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
                     for i in range(1, 5)]
+            print("vis:", coor)
             draw_rotated_rectangle(vis_path, coor, (4, 42, 255), vis_path)
             label = res["name"] + " " + str(round(res["confidence"], 2)) # + " " + str(round(angle, 2)) 
             draw_label(vis_path, coor, label, (4, 42, 255), vis_path)
