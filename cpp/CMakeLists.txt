@@ -29,7 +29,7 @@ find_package(OpenCV REQUIRED)
 # 设置可执行文件名
 set(SOURCES
     main.cpp
-    interface.cpp
+    inferencer.cpp
     plugin.cpp
     utils.cpp
 )

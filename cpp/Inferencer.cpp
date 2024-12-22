@@ -1,5 +1,5 @@
 
-#include "inference.h"
+#include "inferencer.h"
 
 size_t Inferencer::GetSessionInputCount(){
     return session_.GetInputCount();
