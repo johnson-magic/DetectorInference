@@ -1,3 +1,4 @@
+#pragma once
 #include <opencv2/opencv.hpp>
 
 // define a struct to save some information
