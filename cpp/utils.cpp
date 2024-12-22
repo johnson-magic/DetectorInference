@@ -2,7 +2,7 @@
 
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect) {
 
-    Point2f vertices[4];
+    cv::Point2f vertices[4];
 	
 
 
@@ -46,12 +46,4 @@ bool hasImageUpdated(const std::string& image_path, std::filesystem::file_time_t
     }
     
     return false;
-}
-
-
-BOOL WINAPI HandleCtrlC(DWORD signal) {
-    if (signal == CTRL_C_EVENT) {
-        keepRunning = false;
-    }
-    return TRUE;
 }

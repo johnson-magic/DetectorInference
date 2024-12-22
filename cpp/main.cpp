@@ -1,5 +1,4 @@
 #include <iostream>
-#include <filesystem>
 #include <chrono>
 #include <fstream>
 #include <vector>
@@ -10,10 +9,19 @@
 
 #include "inferencer.h"
 #include "plugin.h"
-#include "config.h"
+// #include "config.h"
 #include "utils.h"
 
 using namespace std;
+
+volatile bool keepRunning = true;
+
+BOOL WINAPI HandleCtrlC(DWORD signal) {
+    if (signal == CTRL_C_EVENT) {
+        keepRunning = false;
+    }
+    return TRUE;
+}
 
 int main(int argc, char** argv){
 	if(argc != 5){
@@ -27,19 +35,25 @@ int main(int argc, char** argv){
 	std::string result_path = argv[3];
 	std::string vis_path = argv[4];
 
-	inferencer = Inferencer(model_path, image_path);
-    angle_detector = PrecisionAngleDetection(image_path, result_path, vis_path);
-
+	
+	Inferencer inferencer(model_path, image_path);
+	
+	PrecisionAngleDetection angle_detector(image_path, result_path, vis_path);
+	
+	
 	inferencer.GetInputInfo();
 	inferencer.GetOutputInfo();
 	
 	std::filesystem::file_time_type lastCheckedTime = std::filesystem::file_time_type();
-	volatile bool keepRunning = true;
+	
     while (keepRunning) {
         if (hasImageUpdated(image_path, lastCheckedTime)) {
 
 			inferencer.PreProcess();
+			
+			
 			inferencer.Inference();
+			
 			inferencer.PostProcess();
             angle_detector.Process(inferencer.Get_remain_rotated_objects());
             angle_detector.SaveRes();
@@ -47,7 +61,7 @@ int main(int argc, char** argv){
         }
     }
 
-	inferencer.Release();  // session_options.release();包含在其中，理解对吗？
+	inferencer.Release();  // session_options.release(); is it ok?
 
 	std::cout << "exit after 1 minitus..." << std::endl;
 	std::this_thread::sleep_for(std::chrono::minutes(1));
