@@ -1,4 +1,5 @@
 #include <string>
+#include <opencv2/opencv.hpp>
 #include<onnxruntime_cxx_api.h>
 
 // define a struct to save some information
@@ -11,7 +12,7 @@ typedef struct {
 class Inferencer {
     public:
         Inferencer(const std::string& model_path, const std::string& image_path)
-            : session_(CreateSessionOptions(), CreateEnv(), ConvertToWString(model_path).c_str()),
+            : session_(CreateEnv(), ConvertToWString(model_path).c_str(), CreateSessionOptions()),
             image_path_(image_path)
         {
 
@@ -29,7 +30,7 @@ class Inferencer {
 
     private:
         Ort::Session session_;  // 成员变量
-        std:string image_path_;
+        std::string image_path_;
         cv::Mat image_;
         Ort::Value input_tensor_;
         std::vector<Ort::Value> ort_outputs_;
