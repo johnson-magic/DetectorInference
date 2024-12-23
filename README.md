@@ -81,3 +81,11 @@ Position: below
 ```
 可视化vis.png如下：
 <img src="./imgs/vis.png" height=500 width=300>
+
+## 其他
+### 耗时测试
+&emsp;&emsp;如果想测试程序运行的事件消耗，可以执行如下指令：
+```
+cmake -B ../build/ -DSPEED_TEST=ON
+cmake --build ./build
+```
