@@ -47,3 +47,24 @@ bool hasImageUpdated(const std::string& image_path, std::filesystem::file_time_t
     
     return false;
 }
+
+long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end) {
+    FILETIME ftStart, ftEnd;
+    ULARGE_INTEGER ullStart, ullEnd;
+
+    // 将 SYSTEMTIME 转换为 FILETIME
+    SystemTimeToFileTime(&start, &ftStart);
+    SystemTimeToFileTime(&end, &ftEnd);
+    
+    // 将 FILETIME 转换为 ULARGE_INTEGER 以便进行算术运算
+    ullStart.u.LowPart = ftStart.dwLowDateTime;
+    ullStart.u.HighPart = ftStart.dwHighDateTime;
+    ullEnd.u.LowPart = ftEnd.dwLowDateTime;
+    ullEnd.u.HighPart = ftEnd.dwHighDateTime;
+
+    // 计算时间间隔（单位是 100 纳秒）
+    long long interval = ullEnd.QuadPart - ullStart.QuadPart;
+
+    // 将间隔转换为毫秒（1毫秒 = 10,000 100 纳秒）
+    return interval / 10000;
+}
