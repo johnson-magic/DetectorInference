@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <windows.h>
+// #include <sys/time.h> only linux platform
 
 #include "inferencer.h"
 #include "plugin.h"
@@ -48,16 +49,99 @@ int main(int argc, char** argv){
 	
     while (keepRunning) {
         if (hasImageUpdated(image_path, lastCheckedTime)) {
+			int iter = 1;
 
-			inferencer.PreProcess();
+				#ifdef SPEED_TEST
+					iter = 5;
+				#endif
+
+				#ifdef SPEED_TEST
+					//struct timeval start, end, end_preprocess, end_inferencer, end_postprocess, end_process, end_saveres, end_visres;
+					//gettimeofday(&start, NULL);
+					SYSTEMTIME start, end_preprocess, end_inferencer, end_postprocess, end_process, end_saveres, end_visres;
+					GetSystemTime(&start);
+					std::cout<<"**************************************GetSystemTime(&start)*************************************"<<std::endl;
+
+				#endif
 			
+			for(int i=0; i< iter; i++){
+				inferencer.PreProcess();
+			}
+		
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_preprocess, NULL);
+					GetSystemTime(&end_preprocess);
+					std::cout<<"**************************************GetSystemTime(&end_preprocess)*************************************"<<std::endl;
+				#endif
 			
-			inferencer.Inference();
+			for(int i=0; i< iter; i++){
+				inferencer.Inference();
+			}
+				
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_inferencer, NULL);
+					GetSystemTime(&end_inferencer);
+					std::cout<<"**************************************GetSystemTime(&end_inferencer)*************************************"<<std::endl;
+				#endif
 			
-			inferencer.PostProcess();
-            angle_detector.Process(inferencer.Get_remain_rotated_objects());
-            angle_detector.SaveRes();
-            angle_detector.VisRes(inferencer.Get_remain_rotated_objects());	
+			for(int i=0; i< iter; i++){
+				inferencer.PostProcess();
+			}
+
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_postprocess, NULL);
+					GetSystemTime(&end_postprocess);
+					std::cout<<"**************************************GetSystemTime(&end_postprocess)*************************************"<<std::endl;
+				#endif
+
+			for(int i=0; i< iter; i++){
+            	angle_detector.Process(inferencer.Get_remain_rotated_objects());
+			}
+
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_process, NULL);
+					GetSystemTime(&end_process);
+					std::cout<<"**************************************GetSystemTime(&end_process)*************************************"<<std::endl;
+				#endif
+			
+			for(int i=0; i< iter; i++){
+            	angle_detector.SaveRes();
+			}
+
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_saveres, NULL);
+					GetSystemTime(&end_saveres);
+					std::cout<<"**************************************GetSystemTime(&end_saveres)*************************************"<<std::endl;
+				#endif
+			
+			for(int i=0; i< iter; i++){
+				std::cout<<i<<std::endl;
+            	angle_detector.VisRes(inferencer.Get_remain_rotated_objects());
+			}
+				#ifdef SPEED_TEST
+					//gettimeofday(&end_visres, NULL);
+					GetSystemTime(&end_visres);
+					std::cout<<"**************************************GetSystemTime(&end_visres)*************************************"<<std::endl;
+				#endif
+
+				#ifdef SPEED_TEST // 打印信息
+					//start, end, end_preprocess, end_inferencer, end_postProcess, end_process, end_saveres, end_visres
+					// std::cout<<"total timecost: "<< ((end_visres.tv_sec - start.tv_sec) * 1000 + (end_visres.tv_usec - start.tv_usec) * 0.001)/iter<<std::endl;
+				    // std::cout<<"preprocess of inferencer timecost: "<<((end_preprocess.tv_sec - start.tv_sec) * 1000 + (end_preprocess.tv_usec - start.tv_usec) * 0.001)/iter<<std::endl;
+					// std::cout<<"inference of inferencer timecost: "<<((end_inferencer.tv_sec - end_preprocess.tv_sec) * 1000 + (end_inferencer.tv_usec - end_preprocess.tv_usec) * 0.001)/iter<<std::endl;
+					// std::cout<<"postprocess of inferencer timecost: "<<((end_postProcess.tv_sec - end_inferencer.tv_sec) * 1000 + (end_postProcess.tv_usec - end_inferencer.tv_usec) * 0.001)/iter<<std::endl;
+					// std::cout<<"process of angle detector timecost: "<<((end_process.tv_sec - end_postProcess.tv_sec) * 1000 + (end_process.tv_usec - end_postProcess.tv_usec) * 0.001)/iter<<std::endl;
+					// std::cout<<"save result in txt of angle detector timecost: "<<((end_saveres.tv_sec - end_process.tv_sec) * 1000 + (end_saveres.tv_usec - end_process.tv_usec) * 0.001)/iter<<std::endl;
+					// std::cout<<"save result in image of angle detector timecost: "<<((end_visres.tv_sec - end_saveres.tv_sec) * 1000 + (end_visres.tv_usec - end_saveres.tv_usec) * 0.001)/iter<<std::endl;
+					std::cout<<"total timecost: "<< (GetSecondsInterval(start, end_visres))/iter<<"ms"<<std::endl;
+				    std::cout<<"preprocess of inferencer timecost: "<<(GetSecondsInterval(start, end_preprocess))/iter<<"ms"<<std::endl;
+					std::cout<<"inference of inferencer timecost: "<<(GetSecondsInterval(end_preprocess, end_inferencer))/iter<<"ms"<<std::endl;
+					std::cout<<"postprocess of inferencer timecost: "<<(GetSecondsInterval(end_inferencer, end_postprocess))/iter<<"ms"<<std::endl;
+					std::cout<<"process of angle detector timecost: "<<(GetSecondsInterval(end_postprocess, end_process ))/iter<<"ms"<<std::endl;
+					std::cout<<"save result in txt of angle detector timecost: "<<(GetSecondsInterval(end_process, end_saveres))/iter<<"ms"<<std::endl;
+					std::cout<<"save result in image of angle detector timecost: "<<(GetSecondsInterval(end_saveres, end_visres))/iter<<"ms"<<std::endl;
+				#endif
+
         }
     }
 

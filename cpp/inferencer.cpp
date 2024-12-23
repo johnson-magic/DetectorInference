@@ -96,38 +96,39 @@ void Inferencer::SaveOrtValueAsImage(Ort::Value& value, const std::string& filen
     // 保存图像
     if (!cv::imwrite(filename, imageToSave)) {
         std::cerr << "Failed to save image to " << filename << std::endl;
-    } else {
-        std::cout << "Image saved to " << filename << std::endl;
-    }
+	}
+    // } else {
+    //     std::cout << "Image saved to " << filename << std::endl;
+    // }
 }
 
 void Inferencer::Inference(){
 	const std::array<const char*, 1> inputNames = { input_node_names_[0].c_str() };
 	const std::array<const char*, 1> outNames = { output_node_names_[0].c_str() };
     // debug
-	std::cout<<"11111111;"<<image_.cols<<";"<<image_.rows<<";"<<input_w_<<";"<<input_h_<<";"<<std::endl;
+	// std::cout<<"11111111;"<<image_.cols<<";"<<image_.rows<<";"<<input_w_<<";"<<input_h_<<";"<<std::endl;
 
     cv::Mat blob;
 	cv::dnn::blobFromImage(image_, blob, 1 / 255.0, cv::Size(input_w_, input_h_), cv::Scalar(0, 0, 0), true, false);
     // debug
-	std::cout<<"22222222;"<<image_.cols<<";"<<image_.rows<<std::endl;
+	// std::cout<<"22222222;"<<image_.cols<<";"<<image_.rows<<std::endl;
 	size_t tpixels = input_h_ * input_w_ * 3;
 	std::array<int64_t, 4> input_shape_info{ 1, 3, input_h_, input_w_};
 
     
-    std::cout<<"33333333;"<<image_.cols<<";"<<image_.rows<<std::endl;
+    // std::cout<<"33333333;"<<image_.cols<<";"<<image_.rows<<std::endl;
 	// set input data and inference
 	auto allocator_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
 	Ort::Value input_tensor = Ort::Value::CreateTensor<float>(allocator_info, blob.ptr<float>(), tpixels, input_shape_info.data(), input_shape_info.size());
     assert(input_tensor.IsTensor());
    //float* data = input_tensor.GetTensorMutableData<float>();
-    std::cout << "Tensor values: "<<input_tensor.GetTensorTypeAndShapeInfo().GetElementCount()<<std::endl;;
+    // std::cout << "Tensor values: "<<input_tensor.GetTensorTypeAndShapeInfo().GetElementCount()<<std::endl;;
     // for (int64_t i = 0; i < input_tensor.GetTensorTypeAndShapeInfo().GetElementCount(); ++i) {
     //     std::cout << data[i] << " ";
     // }
     SaveOrtValueAsImage(input_tensor, "output.png");
-    std::cout<<"4444444444;"<<image_.cols<<";"<<image_.rows<<std::endl;
-    std::cout<<*(inputNames.data())<<";"<<*(outNames.data())<<";"<<outNames.size()<<std::endl;
+    // std::cout<<"4444444444;"<<image_.cols<<";"<<image_.rows<<std::endl;
+    // std::cout<<*(inputNames.data())<<";"<<*(outNames.data())<<";"<<outNames.size()<<std::endl;
 
     Ort::SessionOptions session_options;
 	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "yolov11-onnx");
@@ -137,7 +138,7 @@ void Inferencer::Inference(){
     
 	try {
 		ort_outputs_ = session_temp.Run(Ort::RunOptions{ nullptr }, inputNames.data(), &input_tensor, 1, outNames.data(), outNames.size());
-        std::cout<<"5555555;"<<image_.cols<<";"<<image_.rows<<std::endl;
+        // std::cout<<"5555555;"<<image_.cols<<";"<<image_.rows<<std::endl;
     }
 	catch (std::exception e) {
 		std::cout << e.what() << std::endl;

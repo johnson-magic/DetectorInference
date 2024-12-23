@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.10)
 # 设置项目名称
 project(ONNXInference)
 
+option(SPEED_TEST "SPEED TEST" OFF)
+if(SPEED_TEST)
+    add_definitions(-DSPEED_TEST)
+endif()
+
 # 查找 OpenCV 包
 
 find_package(OpenCV REQUIRED)
