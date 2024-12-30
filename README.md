@@ -97,7 +97,28 @@ Position: below
 ## 其他
 ### 耗时测试
 &emsp;&emsp;如果想测试程序运行的事件消耗，可以执行如下指令：
+
+* c++ version
 ```
 cmake -B ../build/ -DSPEED_TEST=ON
 cmake --build ./build
 ```
+
+* python version
+```
+# 打开infer.py文件中的speed_test为True
+python infer.py
+```
+
+|模块名称|c++耗时(ms)|python耗时(ms)|
+|---|---|---|
+|总|4020|2023|
+|inferencer总|710|1316|
+|inferencer-preprocess|54|略|
+|inferencer-inference|347|略|
+|inferencer-postprocess|309|略|
+|angle_detector-总|3309|708|
+|angle_detector-process|4|16|
+|angle_detector-saveres|1|3|
+|angle_detector-savevis|3304|689|
+
