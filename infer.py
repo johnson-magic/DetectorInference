@@ -2,13 +2,14 @@ import os
 import json
 import time
 from ultralytics import YOLO
-from utils.utils import add_angle_result, calculate_md5, get_res_infos, save_res_infos, vis_res_infos
+from utils.utils import add_angle_result, calculate_md5, get_res_infos, save_res_infos, vis_res_infos, write_json
 
 model_path = "./best-cpu.onnx"
 img_path = "./imgs/test.bmp"
 save_path = "./res/data.txt"
 vis_path = "./res/vis.jpg"
 speed_test = True
+conformance_test = False
 
 model = YOLO(model_path, task='obb')
 
@@ -38,7 +39,8 @@ try:
             for i in range(run_iter):
                 json_result = results[0].to_json()  # str
                 json_result = json.loads(json_result)  # json obj
-                    
+                if conformance_test:
+                    write_json(json_result, "remain_rotated_objects.json")    
                     
                 json_result = add_angle_result(json_result)  # 增添了angle
                 res_infos = get_res_infos(json_result)

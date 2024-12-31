@@ -4,8 +4,12 @@ cmake_minimum_required(VERSION 3.10)
 project(ONNXInference)
 
 option(SPEED_TEST "SPEED TEST" OFF)
+option(CONFORMANCE_TEST "conformance test" OFF)
 if(SPEED_TEST)
     add_definitions(-DSPEED_TEST)
+endif()
+if(CONFORMANCE_TEST)
+    add_definitions(-DCONFORMANCE_TEST)
 endif()
 
 # 查找 OpenCV 包
