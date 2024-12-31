@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
@@ -382,6 +383,10 @@ def vis_res_infos(json_result, src_path, vis_path):
             label = res["name"] + " " + str(round(res["confidence"], 2)) # + " " + str(round(angle, 2)) 
             draw_label(vis_path, coor, label, (4, 42, 255), vis_path)
             draw_axes(vis_path, coor[2], vis_path)
+
+def write_json(res, res_path):
+    with open(res_path, "w") as fw:
+	    json.dump(res, fw, ensure_ascii = False, indent = 4)
     
     
     

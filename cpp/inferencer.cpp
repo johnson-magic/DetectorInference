@@ -137,8 +137,16 @@ void Inferencer::Inference(){
 	Ort::Session session_temp(env, model_path_w.c_str(), session_options);
     
 	try {
+		#ifdef CONFORMANCE_TEST
+			SaveOrtValueToTextFile(input_tensor, "onnx_input.txt");
+		#endif
 		ort_outputs_ = session_temp.Run(Ort::RunOptions{ nullptr }, inputNames.data(), &input_tensor, 1, outNames.data(), outNames.size());
         // std::cout<<"5555555;"<<image_.cols<<";"<<image_.rows<<std::endl;
+		#ifdef CONFORMANCE_TEST
+			for(int i=0; i<ort_outputs_.size(); i++){
+				SaveOrtValueToTextFile(input_tensor, "onnx_output_" + std::to_string(i) + ".txt");
+			}
+		#endif
     }
 	catch (std::exception e) {
 		std::cout << e.what() << std::endl;
@@ -168,6 +176,9 @@ void Inferencer::PostProcess(){
 		}
 		Nms(rotated_rects, rotated_rects_agnostic, confidences, class_list);
 	}
+	#ifdef CONFORMANCE_TEST
+		SaveRotatedObjsToTextFile(remain_rotated_objects_, "remain_rotated_objects.txt");
+	#endif
 
 }
 

@@ -68,3 +68,82 @@ long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end) {
     // 将间隔转换为毫秒（1毫秒 = 10,000 100 纳秒）
     return interval / 10000;
 }
+
+void SaveOrtValueToTextFile(const Ort::Value& ortValue, const std::string& filename) {
+    // 获取数据类型
+    Ort::TypeInfo typeInfo = ortValue.GetTypeInfo();
+    auto elementType = typeInfo.GetElementType();
+
+    // 获取数据指针和数据大小
+    void* data = ortValue.GetTensorMutableData<void>();
+    size_t dataSize = ortValue.GetTensorTypeAndShapeInfo().GetTotalSize();
+
+    // 打开文件
+    std::ofstream outFile(filename);
+    if (!outFile) {
+        std::cerr << "无法打开文件 " << filename << std::endl;
+        return;
+    }
+
+    // 将数据写入文件
+    if (elementType == ONNX_TYPE_FLOAT) {
+        float* floatData = static_cast<float*>(data);
+        for (size_t i = 0; i < dataSize; ++i) {
+            outFile << floatData[i] << std::endl;
+        }
+    } else if (elementType == ONNX_TYPE_INT32) {
+        int32_t* intData = static_cast<int32_t*>(data);
+        for (size_t i = 0; i < dataSize; ++i) {
+            outFile << intData[i] << std::endl;
+        }
+    }
+    // 你可以根据需要添加其他类型的处理...
+
+    // 关闭文件
+    outFile.close();
+}
+
+// 分离文件名和扩展名的函数
+std::pair<std::string, std::string> splitext(const std::string& filename) {
+    size_t lastDot = filename.find_last_of(".");
+    if (lastDot == std::string::npos) {
+        // 找不到扩展名，返回原文件名和空字符串
+        return {filename, ""};
+    } else {
+        // 分离文件名和扩展名
+        return {filename.substr(0, lastDot), filename.substr(lastDot)};
+    }
+}
+
+void SaveRotatedObjsToTextFile(const std::vector<RotatedObj>& rotated_objs, const std::string& filename){
+
+    auto [name, ext] = splitext(filename);
+
+    for(auto rotated_obj : rotated_objs){
+        std::string cur_filename = name + "_" + std::to_string(rotated_obj.class_index) + ".txt";
+
+        // 打开文件
+        std::ofstream outFile(filename);
+        if (!outFile) {
+            std::cerr << "无法打开文件 " << filename << std::endl;
+            return;
+        }
+
+        outFile << rotated_obj.class_index << std::endl;
+        outFile << rotated_obj.score << std::endl;
+
+        cv::Point2f vertices[4];
+        rotated_obj.rotated_rect.points(vertices);
+        for(auto vertice : vertices){
+            outFile << vertice.x << std::endl;
+            outFile << vertice.y << std::endl;
+        }
+
+        // 关闭文件
+        outFile.close();
+    }
+
+
+
+
+}

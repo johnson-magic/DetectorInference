@@ -13,6 +13,7 @@
 #include <onnxruntime_cxx_api.h>
 
 #include "config.h"
+#include "utils.h"
 #include "data_structure.h"
 
 
