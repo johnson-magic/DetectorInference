@@ -69,14 +69,14 @@ long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end) {
     return interval / 10000;
 }
 
-void SaveOrtValueToTextFile(const Ort::Value& ortValue, const std::string& filename) {
+void SaveOrtValueToTextFile(Ort::Value& ortValue, const std::string& filename) {
     // 获取数据类型
-    Ort::TypeInfo typeInfo = ortValue.GetTypeInfo();
-    auto elementType = typeInfo.GetElementType();
+    Ort::TensorTypeAndShapeInfo  tensor_type_and_shape_info = ortValue.GetTensorTypeAndShapeInfo();
+    auto elementType = tensor_type_and_shape_info.GetElementType();
 
     // 获取数据指针和数据大小
     void* data = ortValue.GetTensorMutableData<void>();
-    size_t dataSize = ortValue.GetTensorTypeAndShapeInfo().GetTotalSize();
+    size_t dataSize = ortValue.GetTensorTypeAndShapeInfo().GetElementCount();
 
     // 打开文件
     std::ofstream outFile(filename);
@@ -86,12 +86,12 @@ void SaveOrtValueToTextFile(const Ort::Value& ortValue, const std::string& filen
     }
 
     // 将数据写入文件
-    if (elementType == ONNX_TYPE_FLOAT) {
+    if (elementType == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT) {
         float* floatData = static_cast<float*>(data);
         for (size_t i = 0; i < dataSize; ++i) {
             outFile << floatData[i] << std::endl;
         }
-    } else if (elementType == ONNX_TYPE_INT32) {
+    } else if (elementType == ONNX_TENSOR_ELEMENT_DATA_TYPE_INT32) {
         int32_t* intData = static_cast<int32_t*>(data);
         for (size_t i = 0; i < dataSize; ++i) {
             outFile << intData[i] << std::endl;
@@ -115,7 +115,7 @@ std::pair<std::string, std::string> splitext(const std::string& filename) {
     }
 }
 
-void SaveRotatedObjsToTextFile(const std::vector<RotatedObj>& rotated_objs, const std::string& filename){
+void SaveRotatedObjsToTextFile(std::vector<RotatedObj>& rotated_objs, const std::string& filename){
 
     auto [name, ext] = splitext(filename);
 
@@ -123,7 +123,7 @@ void SaveRotatedObjsToTextFile(const std::vector<RotatedObj>& rotated_objs, cons
         std::string cur_filename = name + "_" + std::to_string(rotated_obj.class_index) + ".txt";
 
         // 打开文件
-        std::ofstream outFile(filename);
+        std::ofstream outFile(cur_filename);
         if (!outFile) {
             std::cerr << "无法打开文件 " << filename << std::endl;
             return;

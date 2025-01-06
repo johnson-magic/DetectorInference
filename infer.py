@@ -5,11 +5,11 @@ from ultralytics import YOLO
 from utils.utils import add_angle_result, calculate_md5, get_res_infos, save_res_infos, vis_res_infos, write_json
 
 model_path = "./best-cpu.onnx"
-img_path = "./imgs/test.bmp"
+img_path = "./imgs/test.jpg"
 save_path = "./res/data.txt"
 vis_path = "./res/vis.jpg"
-speed_test = True
-conformance_test = False
+speed_test = False
+conformance_test = True
 
 model = YOLO(model_path, task='obb')
 
