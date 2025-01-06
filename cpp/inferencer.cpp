@@ -174,8 +174,9 @@ void Inferencer::PostProcess(){
 		if (score > modelScoreThreshold_){
 			PrepareForNms(det_output, i, classIdPoint, score, rotated_rects, rotated_rects_agnostic, confidences, class_list);
 		}
-		Nms(rotated_rects, rotated_rects_agnostic, confidences, class_list);
+		
 	}
+	Nms(rotated_rects, rotated_rects_agnostic, confidences, class_list);
 	#ifdef CONFORMANCE_TEST
 		SaveRotatedObjsToTextFile(remain_rotated_objects_, "remain_rotated_objects.txt");
 	#endif
