@@ -20,17 +20,22 @@
 
 class Inferencer {
     public:
-        Inferencer(std::string& model_path, std::string& image_path) : session_(CreateEnv(), ConvertToWString(model_path).c_str(), CreateSessionOptions()), image_path_(return_image_path(image_path)), model_path_(model_path){    
+        Inferencer(std::string& model_path, std::string& image_path){    
 
             modelScoreThreshold_ = 0.2;
             modelNMSThreshold_ = 0.8;
             labels_ = {"big_cirlce","plates","slide"};
+            
+            image_path_ = return_image_path(image_path);
+            model_path_ = model_path;
+            Init(model_path_);
         };
         // Inferencer(std::string& model_path, std::string& image_path){};
 
         
         void GetInputInfo();
         void GetOutputInfo();
+
 
         void PreProcess();
         void Inference();
@@ -42,7 +47,9 @@ class Inferencer {
 
     private:
         Ort::SessionOptions options_;
-        Ort::Session session_;
+        Ort::Session* session_;
+        Ort::Env env_{nullptr};
+
         std::string image_path_;
         std::string model_path_;
         
@@ -68,6 +75,15 @@ class Inferencer {
         double modelScoreThreshold_;
         double modelNMSThreshold_;
         std::vector<std::string> labels_;
+
+        void Init(std::string model_path){
+            static Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "default");
+            
+            Ort::SessionOptions option;
+            option.SetIntraOpNumThreads(1);
+            option.SetGraphOptimizationLevel(ORT_ENABLE_ALL);
+            session_ = new Ort::Session(env, ConvertToWString(model_path).c_str(), option);
+        }
 
         //Ort::Env
         static Ort::Env CreateEnv(){

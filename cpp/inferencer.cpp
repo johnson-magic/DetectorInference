@@ -18,9 +18,9 @@ void Inferencer::GetInputInfo(){
 	// numInputNodes_ = GetSessionInputCount();
     Ort::AllocatorWithDefaultOptions allocator;
 	//for (int i = 0; i < numInputNodes; i++) {
-	auto input_name = session_.GetInputNameAllocated(0, allocator);  // 0 is hardcode
+	auto input_name = session_->GetInputNameAllocated(0, allocator);  // 0 is hardcode
 	input_node_names_.push_back(input_name.get());
-	Ort::TypeInfo input_type_info = session_.GetInputTypeInfo(0);  // 0 is hardcode
+	Ort::TypeInfo input_type_info = session_->GetInputTypeInfo(0);  // 0 is hardcode
 	auto input_tensor_info = input_type_info.GetTensorTypeAndShapeInfo();
 	auto input_dims = input_tensor_info.GetShape();
 	input_w_ = input_dims[3];
@@ -37,10 +37,10 @@ void Inferencer::GetOutputInfo(){
 
 	//numOutputNodes_ = GetSessionOutputCount();
     Ort::AllocatorWithDefaultOptions allocator;
-	auto out_name = session_.GetOutputNameAllocated(0, allocator);  // 0 is hardcode
+	auto out_name = session_->GetOutputNameAllocated(0, allocator);  // 0 is hardcode
 	output_node_names_.push_back(out_name.get());
 	
-	Ort::TypeInfo output_type_info = session_.GetOutputTypeInfo(0);
+	Ort::TypeInfo output_type_info = session_->GetOutputTypeInfo(0);
 	auto output_tensor_info = output_type_info.GetTensorTypeAndShapeInfo();
 	auto output_dims = output_tensor_info.GetShape();
 	output_h_ = output_dims[1];
@@ -126,21 +126,21 @@ void Inferencer::Inference(){
     // for (int64_t i = 0; i < input_tensor.GetTensorTypeAndShapeInfo().GetElementCount(); ++i) {
     //     std::cout << data[i] << " ";
     // }
-    SaveOrtValueAsImage(input_tensor, "output.png");
+    // SaveOrtValueAsImage(input_tensor, "output.png");
     // std::cout<<"4444444444;"<<image_.cols<<";"<<image_.rows<<std::endl;
     // std::cout<<*(inputNames.data())<<";"<<*(outNames.data())<<";"<<outNames.size()<<std::endl;
 
-    Ort::SessionOptions session_options;
-	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "yolov11-onnx");
-	session_options.SetGraphOptimizationLevel(ORT_ENABLE_BASIC);
-	std::basic_string<ORTCHAR_T> model_path_w(model_path_.begin(), model_path_.end());
-	Ort::Session session_temp(env, model_path_w.c_str(), session_options);
+    // Ort::SessionOptions session_options;
+	// Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "yolov11-onnx");
+	// session_options.SetGraphOptimizationLevel(ORT_ENABLE_BASIC);
+	// std::basic_string<ORTCHAR_T> model_path_w(model_path_.begin(), model_path_.end());
+	// Ort::Session session_temp(env, model_path_w.c_str(), session_options);
     
 	try {
 		#ifdef CONFORMANCE_TEST
 			SaveOrtValueToTextFile(input_tensor, "onnx_input.txt");
 		#endif
-		ort_outputs_ = session_temp.Run(Ort::RunOptions{ nullptr }, inputNames.data(), &input_tensor, 1, outNames.data(), outNames.size());
+		ort_outputs_ = session_->Run(Ort::RunOptions{ nullptr }, inputNames.data(), &input_tensor, 1, outNames.data(), outNames.size());
         // std::cout<<"5555555;"<<image_.cols<<";"<<image_.rows<<std::endl;
 		#ifdef CONFORMANCE_TEST
 			for(int i=0; i<ort_outputs_.size(); i++){
@@ -240,7 +240,7 @@ void Inferencer::Nms(std::vector<cv::RotatedRect> & rotated_rects, std::vector<c
 }
 
 void Inferencer::Release(){
-	session_.release();
+	session_->release();
 }
 
 std::vector<RotatedObj> Inferencer::Get_remain_rotated_objects(){
