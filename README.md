@@ -113,15 +113,15 @@ python infer.py
 
 |模块名称|c++耗时(ms)|python耗时(ms)|
 |---|---|---|
-|总|4020|2023|
-|inferencer总|710|1316|
-|inferencer-preprocess|54|略|
-|inferencer-inference|347|略|
-|inferencer-postprocess|309|略|
-|angle_detector-总|3309|708|
-|angle_detector-process|4|16|
-|angle_detector-saveres|1|3|
-|angle_detector-savevis|3304|689|
+|总|538|2023|
+|inferencer总|274|1316|
+|inferencer-preprocess|63|略|
+|inferencer-inference|198|略|
+|inferencer-postprocess|13|略|
+|angle_detector-总|263|708|
+|angle_detector-process|0|16|
+|angle_detector-saveres|2|3|
+|angle_detector-savevis|261|689|
 
 ### 一致性测试
 
