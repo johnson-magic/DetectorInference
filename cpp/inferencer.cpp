@@ -54,12 +54,9 @@ void Inferencer::PreProcess(){
 		std::cerr << "Failed to read the image!" << std::endl;
 		return;
 	}
+	// x_factor_ = image_.cols / static_cast<float>(input_w_);
+	// y_factor_ = image_.rows / static_cast<float>(input_h_);
 	image_ = formatToSquare(image_);
-
-	x_factor_ = image_.cols / static_cast<float>(input_w_);
-	y_factor_ = image_.rows / static_cast<float>(input_h_);
-			
-	
 }
 
 void Inferencer::SaveOrtValueAsImage(Ort::Value& value, const std::string& filename) {
@@ -142,6 +139,8 @@ void Inferencer::Inference(){
 		#endif
 		ort_outputs_ = session_->Run(Ort::RunOptions{ nullptr }, inputNames.data(), &input_tensor, 1, outNames.data(), outNames.size());
         // std::cout<<"5555555;"<<image_.cols<<";"<<image_.rows<<std::endl;
+		//std::cout<<"ort_outputs_.size()"<<ort_outputs_.size()<<std::endl;
+		//SaveOrtValueToTextFile(ort_outputs_[0], "debug.txt");
 		#ifdef CONFORMANCE_TEST
 			for(int i=0; i<ort_outputs_.size(); i++){
 				SaveOrtValueToTextFile(input_tensor, "onnx_output_" + std::to_string(i) + ".txt");
@@ -183,24 +182,57 @@ void Inferencer::PostProcess(){
 
 }
 
-cv::Mat Inferencer::formatToSquare(const cv::Mat image){
+cv::Mat Inferencer::formatToSquare(const cv::Mat img){
 	
-	int col = image.cols;
-    int row = image.rows;
-    int _max = MAX(col, row);
-    cv::Mat result = cv::Mat::zeros(_max, _max, CV_8UC3);
-    image.copyTo(result(cv::Rect(0, 0, col, row)));
-    return result;
+	// int col = image.cols;
+    // int row = image.rows;
+    // int _max = MAX(col, row);
+    // cv::Mat result = cv::Mat::zeros(_max, _max, CV_8UC3);
+    // image.copyTo(result(cv::Rect(0, 0, col, row)));
+    // return result;
+
+	// 计算缩放比例
+    scale_ = std::min(static_cast<double>(input_h_) / img.rows, static_cast<double>(input_w_) / img.cols);
+
+    // 计算新的宽度和高度
+    int new_w = static_cast<int>(std::round(scale_ * img.cols));
+    int new_h = static_cast<int>(std::round(scale_ * img.rows));
+
+    // 缩放图像
+    cv::Mat resized_img;
+    cv::resize(img, resized_img, cv::Size(new_w, new_h), 0, 0, cv::INTER_LINEAR);
+
+    // 计算边框宽度和高度
+    int dw = input_w_ - new_w;
+    int dh = input_h_ - new_h;
+
+    // 分配边框宽度（上下左右）
+    top_ = dh / 2;
+    bottom_ = dh - top_;
+    left_ = dw / 2;
+    right_ = dw - left_;
+
+    // 微调边框宽度以适应整数（这一步可能不是必要的）
+    // top, bottom, left, right 的微调可以根据需要调整或省略
+
+    // 添加边框
+    cv::Mat bordered_img;
+    cv::copyMakeBorder(resized_img, bordered_img, top_, bottom_, left_, right_,
+                       cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
+
+    // 返回处理后的图像
+    return bordered_img;
 }
 
 void Inferencer::PrepareForNms(const cv::Mat & det_output,  const int & i, cv::Point classIdPoint, const double & score, std::vector<cv::RotatedRect> & rotated_rects, std::vector<cv::RotatedRect> & rotated_rects_agnostic, std::vector<float> & confidences, std::vector<int> & class_list){
 	
 	RotatedObj rotated_obj;
+	std::cout<<left_<<";"<<top_<<";"<<x_factor_<<";"<<y_factor_<<std::endl;
 
-	float cx = det_output.at<float>(i, 0)*x_factor_;
-	float cy = det_output.at<float>(i, 1)* y_factor_;
-	float ow = det_output.at<float>(i, 2)*x_factor_;
-	float oh = det_output.at<float>(i, 3)* y_factor_;
+	float cx = (det_output.at<float>(i, 0) - left_) / scale_;
+	float cy = (det_output.at<float>(i, 1) - top_) / scale_;
+	float ow = (det_output.at<float>(i, 2)) / scale_;
+	float oh = (det_output.at<float>(i, 3)) / scale_;
     float angle=det_output.at<float>(i, det_output.cols-1);
 	if (angle>=0.5*pi && angle <= 0.75*pi){
 		angle=angle-pi;

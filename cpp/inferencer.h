@@ -68,6 +68,11 @@ class Inferencer {
 
         float x_factor_;
         float y_factor_;
+        float scale_;
+        int top_;  // border
+        int bottom_;
+        int left_;
+        int right_;
 
         std::vector<RotatedObj> rotated_objects_;  // before nms
         std::vector<RotatedObj> remain_rotated_objects_;  // after nms
