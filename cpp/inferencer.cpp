@@ -227,7 +227,7 @@ cv::Mat Inferencer::formatToSquare(const cv::Mat img){
 void Inferencer::PrepareForNms(const cv::Mat & det_output,  const int & i, cv::Point classIdPoint, const double & score, std::vector<cv::RotatedRect> & rotated_rects, std::vector<cv::RotatedRect> & rotated_rects_agnostic, std::vector<float> & confidences, std::vector<int> & class_list){
 	
 	RotatedObj rotated_obj;
-	std::cout<<left_<<";"<<top_<<";"<<x_factor_<<";"<<y_factor_<<std::endl;
+	// std::cout<<left_<<";"<<top_<<";"<<x_factor_<<";"<<y_factor_<<std::endl;
 
 	float cx = (det_output.at<float>(i, 0) - left_) / scale_;
 	float cy = (det_output.at<float>(i, 1) - top_) / scale_;

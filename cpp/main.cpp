@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 				#endif
 			
 			for(int i=0; i< iter; i++){
-				std::cout<<i<<std::endl;
+				// std::cout<<i<<std::endl;
             	angle_detector.VisRes(inferencer.Get_remain_rotated_objects());
 			}
 				#ifdef SPEED_TEST
@@ -143,11 +143,13 @@ int main(int argc, char** argv){
 				#endif
 
         }
+		std::cout << "已识别完毕，等待新的图片更新中。。。" << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	inferencer.Release();  // session_options.release(); is it ok?
 
-	std::cout << "exit after 1 minitus..." << std::endl;
+	std::cout << "软件将在1分钟后退出。。。" << std::endl;
 	std::this_thread::sleep_for(std::chrono::minutes(1));
     return 0;
 }

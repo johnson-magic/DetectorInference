@@ -70,10 +70,10 @@ include_directories("C:/Users/24601/Desktop/fabu/software/onnxruntime-win-x64-1.
 继续执行如下命令
 ```
 mkdir build
-cmake -B ./build/
-cmake --build ./build/
+cmake -B ./build -DCMAKE_BUILD_TYPE=Release
+cmake --build ./build/ --config Release
 ```
-可执行文件，会生成于```build\Debug\ONNXInference.exe```
+可执行文件，会生成于```build\Release\ONNXInference.exe```
 执行
 
 ```./ONNXInference.exe best.onnx A-2024-01-03-14-13-09_000032.jpg res.txt vis.png```
@@ -101,8 +101,8 @@ Position: below
 
 * c++ version
 ```
-cmake -B ../build/ -DSPEED_TEST=ON
-cmake --build ./build
+cmake -B ./build -DCMAKE_BUILD_TYPE=Release -DSPEED_TEST=ON
+cmake --build ./build/ --config Release
 ```
 
 * python version
