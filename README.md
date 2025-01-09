@@ -19,6 +19,7 @@
 ### 方式1: 傻瓜式安装、运行
 * 双击*click_me_to_install.bat*安装程序
 * 双击*click_me_to_run.bat*运行程序
+  
 ### 方式2: 通过指令安装、运行
 1. 安装python
 
