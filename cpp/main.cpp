@@ -141,15 +141,15 @@ int main(int argc, char** argv){
 					std::cout<<"save result in txt of angle detector timecost: "<<(GetSecondsInterval(end_process, end_saveres))/iter<<"ms"<<std::endl;
 					std::cout<<"save result in image of angle detector timecost: "<<(GetSecondsInterval(end_saveres, end_visres))/iter<<"ms"<<std::endl;
 				#endif
-
+			std::cout << "finished, waiting ..." << std::endl;
         }
-		std::cout << "已识别完毕，等待新的图片更新中。。。" << std::endl;
+		
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	inferencer.Release();  // session_options.release(); is it ok?
 
-	std::cout << "软件将在1分钟后退出。。。" << std::endl;
+	std::cout << "exit after 1 minutes" << std::endl;
 	std::this_thread::sleep_for(std::chrono::minutes(1));
     return 0;
 }
