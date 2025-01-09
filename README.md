@@ -1,6 +1,7 @@
 # PrecisionAngleDetectionInference
 
 - [PrecisionAngleDetectionInference](#precisionangledetectioninference)
+  - [以可执行文件的方式运行](#以可执行文件的方式运行)
   - [以python的方式运行](#以python的方式运行)
     - [方式1: 傻瓜式安装、运行](#方式1-傻瓜式安装运行)
     - [方式2: 通过指令安装、运行](#方式2-通过指令安装运行)
@@ -8,7 +9,12 @@
   - [其他](#其他)
     - [耗时测试](#耗时测试)
     - [一致性测试](#一致性测试)
-
+## 以可执行文件的方式运行
+* 百度网盘链接
+链接: https://pan.baidu.com/s/11xFSvd3OWJKPL4gp_AWpuQ?pwd=bch9 
+提取码: bch9
+* 百度网盘二维码
+<img src="./imgs/QR.png">
 ## 以python的方式运行
 ### 方式1: 傻瓜式安装、运行
 * 双击*click_me_to_install.bat*安装程序
