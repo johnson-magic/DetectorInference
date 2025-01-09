@@ -15,6 +15,7 @@
 提取码: bch9
 * 百度网盘二维码
 <img src="./imgs/QR.png">
+
 ## 以python的方式运行
 ### 方式1: 傻瓜式安装、运行
 * 双击*click_me_to_install.bat*安装程序
