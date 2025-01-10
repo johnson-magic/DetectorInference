@@ -36,7 +36,7 @@ void PrecisionAngleDetection::Process(const std::vector<RotatedObj> & rotated_ob
 
 	}
 
-	if(slider_center_point_.y < slider_center_point_.y){
+	if(slider_center_point_.y < center_point_.y){
 		position_ = "above";
 	}
 	else{
