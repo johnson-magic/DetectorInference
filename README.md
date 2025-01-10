@@ -11,8 +11,8 @@
     - [一致性测试](#一致性测试)
 ## 以可执行文件的方式运行
 * 百度网盘链接
-链接: https://pan.baidu.com/s/1AQUx3Yu6CSOhGkGrG-yNRw?pwd=y5bs
-提取码: y5bs
+链接: https://pan.baidu.com/s/19-oFN0UOhoIdenumeKd8qQ?pwd=uyjy 
+提取码: uyjy
 * 百度网盘二维码
 <img src="./imgs/QR.png">
 
