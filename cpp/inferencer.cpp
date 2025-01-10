@@ -164,6 +164,7 @@ void Inferencer::PostProcess(){
 	std::vector<float> confidences;
 	std::vector<int> class_list;
 
+	rotated_objects_.clear();
 	for (int i = 0; i < det_output.rows; i++) {
 		cv::Mat classes_scores = det_output.row(i).colRange(4, 4+labels_.size());
 		cv::Point classIdPoint;
@@ -261,6 +262,7 @@ void Inferencer::Nms(std::vector<cv::RotatedRect> & rotated_rects, std::vector<c
 	std::vector<int> remain_ids;
 	cv::dnn::NMSBoxes(rotated_rects_agnostic, confidences, modelScoreThreshold_, modelNMSThreshold_, remain_ids);
 
+	remain_rotated_objects_.clear();
 	for (int i=0;i< remain_ids.size();i++)
 	{
 		int id = remain_ids[i];
