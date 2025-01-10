@@ -1,3 +1,4 @@
+import cv2
 import json
 import numpy as np
 import matplotlib.pyplot as plt
@@ -101,15 +102,21 @@ def get_res_infos(results: list) -> dict:
     infos = {}
     for res in results:
         if res["name"] == "big_circle":
-            coors = [(res["box"][f"x{i}"], res["box"][f"y{i}"])
-                       for i in range(1, 5)]
+            coors = np.array([[int(res["box"][f"x{i}"]), int(res["box"][f"y{i}"])]
+                       for i in range(1, 5)])
              
-            center_point = calculate_box_center(coors)
-            line_half_point = calculate_line_center(coors[:2])
-            radius = calculate_distance(center_point, line_half_point)
+            # center_point = calculate_box_center(coors)
+            # line_half_point = calculate_line_center(coors[:2])
+            # radius_1 = calculate_distance(center_point, line_half_point)
+            # line_half_point = calculate_line_center(coors[2:4])
+            # radius_2 = calculate_distance(center_point, line_half_point)
             
-            infos["CenterPoint"] = center_point
-            infos["Diameter"] = 2 * radius
+            rect = cv2.minAreaRect(coors)
+            (x, y), (width, height), _ = rect
+            
+            
+            infos["CenterPoint"] = (x, y)
+            infos["Diameter"] = (width + height) / 2
         elif res["name"] == "plates":
             infos["Angle"] = res["angle"]
         elif res["name"] == "slide":
