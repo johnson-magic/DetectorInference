@@ -2,6 +2,7 @@
 #include "plugin.h"
 
 void PrecisionAngleDetection::Process(const std::vector<RotatedObj> & rotated_objs){
+	Clear();
 	
 	for(auto rotated_obj : rotated_objs){
 		int cls_id = rotated_obj.class_index;
@@ -88,6 +89,17 @@ void PrecisionAngleDetection::SaveRes(){
 	
 
 	outFile.close();
+}
+
+void PrecisionAngleDetection::Clear(){
+	center_point_.x = -1;
+	center_point_.y = -1;
+	angle_ = 720;
+	position_ = "unknown";
+	diameter_ = -1;
+	slider_angle_ = 720;
+	slider_center_point_.x = -1;
+	slider_center_point_.y = -1;
 }
 
     		
