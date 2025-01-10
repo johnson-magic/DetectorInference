@@ -2,6 +2,7 @@
 #include "plugin.h"
 
 void PrecisionAngleDetection::Process(const std::vector<RotatedObj> & rotated_objs){
+	
 	for(auto rotated_obj : rotated_objs){
 		int cls_id = rotated_obj.class_index;
 		float obj_score = rotated_obj.score;
@@ -21,26 +22,29 @@ void PrecisionAngleDetection::Process(const std::vector<RotatedObj> & rotated_ob
 				angle_ = - rotated_obj.rotated_rect.angle;
 			}
 			else{
-				angle_ = -(90 + rotated_obj.rotated_rect.angle);
+				angle_ = -(rotated_obj.rotated_rect.angle - 90);
 			}
 		}
 		else if(2 == cls_id){
+			//std::cout<<rotated_obj.rotated_rect.size.width<<";"<<rotated_obj.rotated_rect.size.height<<";"<<rotated_obj.rotated_rect.angle<<std::endl;
 			if(rotated_obj.rotated_rect.size.width >= rotated_obj.rotated_rect.size.height){
 				slider_angle_ = - rotated_obj.rotated_rect.angle;
 			}
 			else{
-				slider_angle_ = -(90 + rotated_obj.rotated_rect.angle);
+				slider_angle_ = -(rotated_obj.rotated_rect.angle - 90);
 			}
 			slider_center_point_ = rotated_obj.rotated_rect.center;
 		}
 
 	}
 
-	if(slider_center_point_.y < center_point_.y){
-		position_ = "above";
-	}
-	else{
-		position_ = "below";
+	if(slider_center_point_.y != -1 && center_point_.y != -1){
+		if(slider_center_point_.y < center_point_.y){
+			position_ = "above";
+		}
+		else{
+			position_ = "below";
+		}
 	}
 	
 }
@@ -67,12 +71,21 @@ void PrecisionAngleDetection::SaveRes(){
 		return;
 	}
 
-	outFile << "Centerpoint: " << center_point_.x <<"," << center_point_.y << std::endl;
-	outFile << "angle: " << angle_ << std::endl;
-	outFile << "SliderAngle: " << slider_angle_ << std::endl;
-	outFile << "Diameter: " << diameter_ << std::endl;
-	outFile << "SliderCenterPoint: " << slider_center_point_.x << "," << slider_center_point_.y << std::endl;
-	outFile<<"Position: "<<position_<<std::endl;
+	outFile << "Centerpoint " << center_point_.x <<"," << center_point_.y << std::endl;
+	if(angle_ != 720){
+		outFile << "Angle " << angle_ << std::endl;
+	}else{
+		outFile << "Angle " << "unknown" << std::endl;
+	}
+	outFile<<"Position "<<position_<<std::endl;
+	outFile << "Diameter " << diameter_ << std::endl;
+	if(angle_ != 720){
+		outFile << "SliderAngle " << slider_angle_ << std::endl;
+	}else{
+		outFile << "SliderAngle " << "unknown" << std::endl;
+	}
+	//outFile << "SliderCenterPoint: " << slider_center_point_.x << "," << slider_center_point_.y << std::endl;
+	
 
 	outFile.close();
 }

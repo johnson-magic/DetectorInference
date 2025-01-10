@@ -12,6 +12,16 @@ class PrecisionAngleDetection{
 
 public:
     PrecisionAngleDetection(std::string image_path, std::string result_path, std::string vis_path): image_path_(image_path), result_path_(result_path), vis_path_(vis_path){
+        center_point_.x = -1;
+        center_point_.y = -1;
+        angle_ = 720;
+        position_ = "unknown";
+        diameter_ = -1;
+        slider_angle_ = 720;
+
+
+
+
 
     };
 
