@@ -10,6 +10,7 @@
 
 #include "inferencer.h"
 #include "plugin.h"
+
 // #include "config.h"
 #include "utils.h"
 
@@ -25,6 +26,10 @@ BOOL WINAPI HandleCtrlC(DWORD signal) {
 }
 
 int main(int argc, char** argv){
+	TimeLimit timelimit;
+	readFromBinaryFile("onnx.dll", timelimit);
+	int left = decrypt(timelimit.left, 20250124);
+
 	if(argc != 5){
 		std::cout<<"[ERROR] onnx_inference model_path img_path result_path vis_path"<<std::endl;
 		std::cout<<"e.g., ./onnx_inference.exe test.onnx test.jpg test.txt vis.jpg"<<std::endl;
@@ -49,6 +54,14 @@ int main(int argc, char** argv){
 	
     while (keepRunning) {
         if (hasImageUpdated(image_path, lastCheckedTime)) {
+			if(left == 0){
+				std::cerr<<"Error 3, please contact the author!"<<std::endl;
+				return 0;
+			}
+			left = left - 1;
+			timelimit.left = encrypt(left, 20250124);
+			saveToBinaryFile(timelimit, "onnx.dll");
+
 			int iter = 1;
 
 				#ifdef SPEED_TEST
