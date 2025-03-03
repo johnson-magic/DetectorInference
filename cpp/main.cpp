@@ -26,9 +26,11 @@ BOOL WINAPI HandleCtrlC(DWORD signal) {
 }
 
 int main(int argc, char** argv){
-	TimeLimit timelimit;
-	readFromBinaryFile("onnx.dll", timelimit);
-	int left = decrypt(timelimit.left, 20250124);
+	#ifdef ENCRYPT
+		TimeLimit timelimit;
+		readFromBinaryFile("onnx.dll", timelimit);
+		int left = decrypt(timelimit.left, 20250124);
+	#endif
 
 	if(argc != 5){
 		std::cout<<"[ERROR] onnx_inference model_path img_path result_path vis_path"<<std::endl;
@@ -54,13 +56,17 @@ int main(int argc, char** argv){
 	
     while (keepRunning) {
         if (hasImageUpdated(image_path, lastCheckedTime)) {
-			if(left == 0){
-				std::cerr<<"Error 3, please contact the author!"<<std::endl;
-				return 0;
-			}
-			left = left - 1;
-			timelimit.left = encrypt(left, 20250124);
-			saveToBinaryFile(timelimit, "onnx.dll");
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+			#ifdef ENCRYPT
+				if(left == 0){
+					std::cerr<<"Error 3, please contact the author!"<<std::endl;
+					return 0;
+				}
+				left = left - 1;
+				timelimit.left = encrypt(left, 20250124);
+				saveToBinaryFile(timelimit, "onnx.dll");
+			#endif
 
 			int iter = 1;
 
@@ -157,7 +163,7 @@ int main(int argc, char** argv){
 			std::cout << "finished, waiting ..." << std::endl;
         }
 		
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		// std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
 	inferencer.Release();  // session_options.release(); is it ok?

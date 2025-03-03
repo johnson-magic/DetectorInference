@@ -6,11 +6,15 @@ set(CMAKE_BUILD_TYPE Release)
 
 option(SPEED_TEST "SPEED TEST" OFF)
 option(CONFORMANCE_TEST "conformance test" OFF)
+option(ENCRYPT "encrypt" OFF)
 if(SPEED_TEST)
     add_definitions(-DSPEED_TEST)
 endif()
 if(CONFORMANCE_TEST)
     add_definitions(-DCONFORMANCE_TEST)
+endif()
+if(ENCRYPT)
+    add_definitions(-DENCRYPT)
 endif()
 
 # 查找 OpenCV 包
