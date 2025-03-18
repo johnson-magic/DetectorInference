@@ -11,11 +11,8 @@
     - [一致性测试](#一致性测试)
 ## 以可执行文件的方式运行
 * 百度网盘链接
-链接: https://pan.baidu.com/s/1gMtJmphfkvGPcRU9ltm2Yg
-提取码: hy2u
-
-* 百度网盘二维码
-<img src="./imgs/QR.png">
+链接: https://pan.baidu.com/s/1yMs1CQQFVkHqmbElamY3jQ
+提取码: th7y
 
 ## 以python的方式运行
 ### 方式1: 傻瓜式安装、运行
