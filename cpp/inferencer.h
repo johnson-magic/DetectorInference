@@ -20,13 +20,13 @@
 
 class Inferencer {
     public:
-        Inferencer(std::string& model_path, std::string& image_path){    
+        Inferencer(std::string& model_path){    
 
             modelScoreThreshold_ = 0.2;
             modelNMSThreshold_ = 0.8;
             labels_ = {"big_cirlce","plates","slide"};
             
-            image_path_ = return_image_path(image_path);
+            // image_path_ = return_image_path(image_path);
             model_path_ = model_path;
             Init(model_path_);
         };
@@ -37,7 +37,7 @@ class Inferencer {
         void GetOutputInfo();
 
 
-        void PreProcess();
+        void PreProcess(std::string& image_path);
         void Inference();
         void PostProcess();
 

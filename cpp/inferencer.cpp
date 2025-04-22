@@ -47,8 +47,9 @@ void Inferencer::GetOutputInfo(){
 	output_w_ = output_dims[2];
 }
 
-void Inferencer::PreProcess(){
+void Inferencer::PreProcess(std::string& image_path){
 
+	image_path_ =  return_image_path(image_path);
 	image_ = cv::imread(image_path_);
 	if (image_.empty()) {
 		std::cerr << "Failed to read the image!" << std::endl;

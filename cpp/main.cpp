@@ -44,7 +44,7 @@ int main(int argc, char** argv){
 	std::string vis_path = argv[4];
 
 	
-	Inferencer inferencer(model_path, image_path);
+	Inferencer inferencer(model_path);
 	
 	PrecisionAngleDetection angle_detector(image_path, result_path, vis_path);
 	
@@ -84,7 +84,7 @@ int main(int argc, char** argv){
 				#endif
 			
 			for(int i=0; i< iter; i++){
-				inferencer.PreProcess();
+				inferencer.PreProcess(image_path);
 			}
 		
 				#ifdef SPEED_TEST
