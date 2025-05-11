@@ -60,6 +60,18 @@ void Inferencer::PreProcess(std::string& image_path){
 	image_ = formatToSquare(image_);
 }
 
+void Inferencer::PreProcess(cv::Mat image){
+
+	image_ = image;
+	if (image_.empty()) {
+		std::cerr << "Failed to read the image!" << std::endl;
+		return;
+	}
+	// x_factor_ = image_.cols / static_cast<float>(input_w_);
+	// y_factor_ = image_.rows / static_cast<float>(input_h_);
+	image_ = formatToSquare(image_);
+}
+
 void Inferencer::SaveOrtValueAsImage(Ort::Value& value, const std::string& filename) {
     // 确保值是张量
     if (!value.IsTensor()) {
