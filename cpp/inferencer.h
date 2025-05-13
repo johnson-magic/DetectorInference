@@ -22,7 +22,7 @@ class Inferencer {
     public:
         Inferencer(std::string& model_path){    
 
-            modelScoreThreshold_ = 0.2;
+            modelScoreThreshold_ = 0.5;
             modelNMSThreshold_ = 0.8;
             labels_ = {"big_cirlce","plates","slide"};
             
