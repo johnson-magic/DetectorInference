@@ -3,17 +3,10 @@
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect) {
 
     cv::Point2f vertices[4];
-	
-
-
     rotatedRect.points(vertices);
-
-   
     for(int i = 0; i < 4; ++i) {
 		cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
 	}
-      
-        
 }
 
 
@@ -30,22 +23,33 @@ void printRotatedRect(const cv::RotatedRect& rotatedRect) {
 }
 
 
-bool hasImageUpdated(const std::string& image_path, std::filesystem::file_time_type& lastCheckedTime) {
-    
-    if (!std::filesystem::exists(image_path)) {
-        std::cout << "file does not exists: " << image_path << std::endl;
+bool hasImageUpdated(const std::string& image_path, cv::Scalar &pre_pixel_sum) {
+    std::ifstream test_open(image_path);
+    if(test_open.is_open()){
+        cv::Mat img_temp;
+        try{
+            img_temp = cv::imread(image_path);
+            if (img_temp.empty()) {
+                test_open.close();
+	    	    // std::cerr << "Failed to read the image1!" << std::endl; //这里无需让外部知道
+                return false;
+            }
+        }catch(const cv::Exception& e) {
+            test_open.close();
+            return false;
+        }
+        cv::Scalar cur_pixel_sum=cv::sum(img_temp);
+        if(pre_pixel_sum == cur_pixel_sum){
+            return false;
+        }
+        else{
+            pre_pixel_sum = cur_pixel_sum;
+            return true;
+        }
+    }
+    else{
         return false;
     }
-
-
-    std::filesystem::file_time_type curWriteTime = std::filesystem::last_write_time(image_path);
-    
-    if (curWriteTime != lastCheckedTime) {
-        lastCheckedTime = curWriteTime;
-        return true;
-    }
-    
-    return false;
 }
 
 long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end) {
@@ -142,10 +146,6 @@ void SaveRotatedObjsToTextFile(std::vector<RotatedObj>& rotated_objs, const std:
         // 关闭文件
         outFile.close();
     }
-
-
-
-
 }
 
 
@@ -156,7 +156,6 @@ void readFromBinaryFile(const std::string& filename, const TimeLimit& timelimit)
         std::cerr <<"Error 1, please contact the author!"<< filename << std::endl;
         return;
     }
-
     infile.read((char*)&timelimit, sizeof(timelimit));
     infile.close();
 }
@@ -169,7 +168,6 @@ void saveToBinaryFile(const TimeLimit& timelimit, const std::string& filename) {
         std::cerr << "Error 2, please contact the author!" << filename << std::endl;
         return;
     }
-
     outfile.write((char*)&timelimit, sizeof(timelimit));
     outfile.close();
 }

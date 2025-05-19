@@ -6,12 +6,11 @@
 #include <onnxruntime_cxx_api.h>
 
 #include "data_structure.h"
-
 #include "time_limit.h"
 
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect);
 void printRotatedRect(const cv::RotatedRect& rotatedRect);
-bool hasImageUpdated(const std::string& image_path, std::filesystem::file_time_type& lastCheckedTime);
+bool hasImageUpdated(const std::string& image_path, cv::Scalar &pre_pixel_sum);
 long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end);
 void SaveOrtValueToTextFile(Ort::Value& ortValue, const std::string& filename);
 std::pair<std::string, std::string> splitext(const std::string& filename);
