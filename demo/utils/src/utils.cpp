@@ -1,11 +1,19 @@
 #include "utils.h"
 
-void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect) {
+void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect, int cls) {
 
     cv::Point2f vertices[4];
     rotatedRect.points(vertices);
     for(int i = 0; i < 4; ++i) {
-		cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
+        if(cls == 0){
+		    cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 2);
+        }
+        else if(cls == 1){
+            cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
+        }
+        else{
+            cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 0, 255), 2);
+        }
 	}
 }
 

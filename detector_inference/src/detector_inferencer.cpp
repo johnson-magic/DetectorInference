@@ -262,7 +262,9 @@ void DetectorInferencer::Nms(std::vector<cv::RotatedRect> & rotated_rects, std::
 	{
 		int id = remain_ids[i];
 		RotatedObj rotated_obj = rotated_objects_[id];
-		remain_rotated_objects_.push_back(rotated_obj);
+		if(rotated_obj.score > 0.5){
+			remain_rotated_objects_.push_back(rotated_obj);
+		}
 
 	}
 

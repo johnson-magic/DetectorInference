@@ -8,7 +8,7 @@
 #include "data_structure.h"
 #include "time_limit.h"
 
-void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect);
+void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rotatedRect, int cls);
 void printRotatedRect(const cv::RotatedRect& rotatedRect);
 bool hasImageUpdated(const std::string& image_path, cv::Scalar &pre_pixel_sum);
 long long GetSecondsInterval(SYSTEMTIME start, SYSTEMTIME end);
