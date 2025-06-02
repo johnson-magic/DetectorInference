@@ -10,6 +10,9 @@
 #include "utils.h"
 #include "detector_inferencer.h"
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
 
 using namespace std;
 
@@ -22,7 +25,91 @@ BOOL WINAPI HandleCtrlC(DWORD signal) {
     return TRUE;
 }
 
+bool isImageFile(const fs::path& path) {
+    static const std::vector<std::string> extensions = {
+        ".jpg", ".jpeg", ".png", 
+        ".bmp", ".gif", ".tiff"
+    };
+    
+    std::string ext = path.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    
+    return std::find(extensions.begin(), extensions.end(), ext) != extensions.end();
+}
+
+void scanImages(const fs::path& dir_path) {
+    try {
+        if (!fs::exists(dir_path) || !fs::is_directory(dir_path)) {
+            std::cerr << "Invalid directory path\n";
+            return;
+        }
+
+        for (const auto& entry : fs::directory_iterator(dir_path)) {
+            if (fs::is_regular_file(entry) && isImageFile(entry.path())) {
+                std::cout << "Found image: " << entry.path().filename() << "\n";
+            }
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << "\n";
+    }
+}
+
 int main(int argc, char** argv){
+	if(argc != 5){
+		std::cout<<"[ERROR] onnx_inference model_path class_num img_root vis_root"<<std::endl;
+		std::cout<<"e.g., ./onnx_inference.exe test.onnx 3 test_root vis_root"<<std::endl;
+		return 0;
+	}
+
+	std::string model_path = argv[1];
+	int class_num = std::stoi(argv[2]);
+	std::string image_root = argv[3];
+	std::string vis_root = argv[4];
+
+	DetectorInferencer detector(model_path, class_num);
+	detector.GetInputInfo();
+	detector.GetOutputInfo();
+
+	
+
+
+	for (const auto& entry : fs::directory_iterator(image_root)){
+		if (fs::is_regular_file(entry) && isImageFile(entry.path())){
+			detector.PreProcess(entry.path().string());
+			detector.Inference();
+			detector.PostProcess();
+			std::vector<RotatedObj> res = detector.Get_remain_rotated_objects();
+
+			std::ifstream test_open(entry.path());
+			if(test_open.is_open()){
+				cv::Mat image = cv::imread(entry.path().string());
+				test_open.close();
+				if (image.empty()) {
+					std::cerr << "Failed to read the image0!" << std::endl;
+					continue;
+				}
+				for(int j=0; j<res.size(); j++){
+					// printRotatedRect(res[j].rotated_rect);
+					if(res[j].score > 0.6){
+						drawRotatedRect(image, res[j].rotated_rect, res[j].class_index);
+					}
+					//std::cout<<res[j].score<<std::endl;
+				}
+				fs::path p(entry.path().string());
+				p.filename().string();
+				std::cout<<vis_root + "\\" + p.filename().string()<<std::endl;
+				cv::imwrite(vis_root + "\\" + p.filename().string(), image);
+			}
+		}
+	}
+
+	return 0;
+
+
+	
+}
+
+int main0(int argc, char** argv){
 	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_SILENT);  // release模式可以屏蔽掉，如果调试模式可以打开
 	#ifdef ENCRYPT
 		TimeLimit timelimit;
@@ -123,7 +210,7 @@ int main(int argc, char** argv){
 					}
 					for(int j=0; j<res.size(); j++){
 						// printRotatedRect(res[j].rotated_rect);
-						drawRotatedRect(image, res[j].rotated_rect);
+						drawRotatedRect(image, res[j].rotated_rect, res[j].class_index);
 					}
 					cv::imwrite(vis_path, image);
 				}
