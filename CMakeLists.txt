@@ -25,21 +25,19 @@ set(DETECTOR_DEMO_SOURCES
     ./demo/main.cpp
     ./demo/utils/src/utils.cpp
 )
-
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/build/build/generators/")
 add_subdirectory("./detector_inference")
 add_executable(${PROJECT_NAME} ${DETECTOR_DEMO_SOURCES})
 include_directories("./demo/utils/include")
 include_directories("./detector_inference/include")
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories("D:/software_path/onnxruntime-win-x64-1.15.1/onnxruntime-win-x64-1.15.1/include")
+find_package(onnxruntime REQUIRED)
 
 # 链接 OpenCV 库和 ONNX Runtime 库
 target_link_libraries(${PROJECT_NAME}
-                      ${OpenCV_LIBS}
                       detector_inference
-                      "D:/software_path/onnxruntime-win-x64-1.15.1/onnxruntime-win-x64-1.15.1/lib/onnxruntime.lib"
-                      "D:/software_path/onnxruntime-win-x64-1.15.1/onnxruntime-win-x64-1.15.1/lib/onnxruntime_providers_shared.lib")
+                      opencv::opencv
+                      onnxruntime::onnxruntime)
 
 
 # 设置 C++ 标准
