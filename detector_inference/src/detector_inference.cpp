@@ -1,4 +1,4 @@
-#include "detector_inferencer.h"
+#include "detector_inference.h"
 
 #define pi acos(-1)
 
